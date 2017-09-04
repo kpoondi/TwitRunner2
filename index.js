@@ -7,36 +7,46 @@ var T = new Twit({
   access_token_secret:  'qbef1NnzaHo2KURX1qKP14kyD4aLWP2oO8S9b9nmBR6ed',
 });
 
-// setInterval(tweetIt, 1000*20);
+setInterval(makeTweet, 1000*60);
 
-var strava = require('strava-v3');
+makeTweet();
+function makeTweet() {
+	var strava = require('strava-v3');
 
-var getParams = {
-	user_id: '825218879643406336',
-	count: 1
-}
+	var getParams = {
+		user_id: '825218879643406336',
+		count: 1
+	}
 
-T.get('statuses/user_timeline', getParams, getTweet);
+//T.get('statuses/user_timeline', getParams, getTweet);
 
-strava.athlete.listActivities({},function(err,payload,limits) {
-	if(!err) {
-		var tweet = {
-			status: 'testtest123'
+	strava.athlete.listActivities({},function(err, payload, limits) {
+		if(!err) {
+			var tweet = {
+				status: payload[0].name
+			}	
+			T.post('statuses/update', tweet, tweeted);
 		}
-		T.post('statuses/update', tweet, tweeted);
-	}
-	else {
-    	console.log(err);
-	}
-});
+		else {
+    		console.log(err);
 
+		}
+		console.log('*****************************');
+		for(var i = 0;i < payload.length; i++) {
+			console.log(payload[i].name);
+		}
+		console.log('*****************************');
 
-function tweeted(err, data, response) {
-	if(err) {
-		console.log("Error");
+	});
+
+	function tweeted(err, data, response) {
+		if(err) {
+			console.log("Error");
+		}
 	}
-}
 
 function getTweet(err, data, response) {
 	console.log(data[0].text);
+}
+
 }
